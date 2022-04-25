@@ -20,9 +20,14 @@ import frontend.utility as util
 # RIPE OPTIONS AND COSTANTS
 ################################################################################
 
-ripeLogFile = "results/log.tmp"
-ripeErrFile = "results/err.tmp"
+ripeLogFile = "/tmp/ripe_log"
+ripeErrFile = "/tmp/ripe_log2"
 ripeAttFile = "/tmp/ripe-eval/f_xxxx"
+
+# TODO: enable this only after new backend
+# ripeLogFile = "results/log.tmp"
+# ripeErrFile = "results/err.tmp"
+# ripeAttFile = "/tmp/ripe-eval/f_xxxx"
 
 compilers = [
     "gcc",
@@ -37,15 +42,15 @@ code_ptr = [
     "funcptrheap",
     "funcptrbss",
     "funcptrdata",
+    "structfuncptrstack",
+    "structfuncptrheap",
+    "structfuncptrbss",
+    "structfuncptrdata",
     "longjmpstackvar",
     "longjmpstackparam",
     "longjmpheap",
     "longjmpbss",
-    "longjmpdata",
-    "structfuncptrstack",
-    "structfuncptrheap",
-    "structfuncptrdata",
-    "structfuncptrbss"
+    "longjmpdata"
 ]
 
 funcs = [
@@ -69,10 +74,10 @@ locations = [
 ]
 
 attacks = [
-    "nonop",
-    "simplenop",
+    # "nonop",
+    # "simplenop",
+    # "createfile",
     "simplenopequival",
-    "createfile",
     "r2libc",
     "rop"
 ]
@@ -110,11 +115,12 @@ results = {
 if len(sys.argv) < 4:
     util.printUsage(sys.argv[0])
 
-techniques = util.parseTechniqueOption(sys.argv[1])
+techniques = util.parseTechniqueOption(sys.argv[1], techniques)
 repeat_times = util.parseRepeatOption(sys.argv[2])
-compilers = util.parseCompilerOption(sys.argv[3])
+compilers = util.parseCompilerOption(sys.argv[3], compilers)
 
-util.makeDir("results")
+# TODO: enable this only after backend is complete.
+# util.makeDir("results")
 
 for compiler in compilers:
     for technique in techniques:
@@ -126,13 +132,17 @@ for compiler in compilers:
                         attempts = 0
                         successfulAttempts = 0
                         attackPossible = True
+                        logInfo = []
 
                         while attempts < repeat_times:
                             attempts += 1
                             util.rmFile(ripeLogFile)
 
-                            params = (compiler, technique, location,
+                            params = (technique, location,
                                       ptr, attack, function)
+
+                            term.tWrite(util.getParamsString(params))
+                            term.tFlush()
 
                             util.dumpParamsOntoFile(params, ripeLogFile)
 
@@ -148,7 +158,7 @@ for compiler in compilers:
                                 attackPossible = False
                                 break  # Not possible once, not possible always :)
 
-                            logInfo = term.parseLogInfo(logLine)
+                            logInfo += term.parseLogInfo(logLine)
 
                             if util.fileExist(ripeAttFile):
                                 successfulAttempts += 1
@@ -163,29 +173,41 @@ for compiler in compilers:
                         if successfulAttempts == repeat_times:
                             results[compiler]['ok'] += 1
                             if verbose["print-ok"]:
-                                logInfo += term.parseLogError(logLine)
                                 term.printLogOk(
-                                    compiler, params, successfulAttempts, repeat_times, logInfo)
+                                    compiler, util.getParamsString(params), successfulAttempts, repeat_times, logInfo)
 
                         # FAIL
                         elif successfulAttempts == 0:
                             results[compiler]['fail'] += 1
                             if verbose["print-fail"]:
-                                logInfo += term.parseLogError(logLine)
+
+                                i = 1
+                                while i < repeat_times:
+                                    logInfo += term.parseLogError(
+                                        util.fileReadLine(ripeErrFile+str(i)))
+                                    i += 1
+
                                 term.printLogFail(
-                                    compiler, params, successfulAttempts, repeat_times, logInfo)
+                                    compiler, util.getParamsString(params), successfulAttempts, repeat_times, logInfo)
 
                         # SOME
                         else:
                             results[compiler]['some'] += 1
                             if verbose["print-some"]:
+
+                                i = 1
+                                while i < repeat_times:
+                                    logInfo += term.parseLogError(
+                                        util.fileReadLine(ripeErrFile+str(i)))
+                                    i += 1
+
                                 term.printLogSome(
-                                    compiler, params, successfulAttempts, repeat_times, logInfo)
+                                    compiler, util.getParamsString(params), successfulAttempts, repeat_times, logInfo)
 
 
 # Benchmark finished, print out results
 
-for compiler in results:
+for compiler in compilers:
     print("\n" + term.bold("||Summary " + compiler + "||"))
 
     attacks = results[compiler]["ok"] + \

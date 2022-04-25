@@ -17,7 +17,7 @@ import sys
 
 
 def tWrite(line: str):
-    sys.stdout.write("... Running %s ...\r", line)
+    sys.stdout.write("... Running %s ...\r" % line)
 
 
 def tFlush():
@@ -115,7 +115,7 @@ def parseLogError(logLine: str) -> list:
     return additionalInfo
 
 
-def printLog(message: str, colorFn: function, compiler: str, params: str, successfulAttempts: int, repeatTimes: int, additionalInfo: list):
+def printLog(message: str, colorFn: callable, compiler: str, params: str, successfulAttempts: int, repeatTimes: int, additionalInfo: list):
     print("%5s %s %6s (%s/%s) %s" % (compiler, params, colorFn(message, 4),
           successfulAttempts, repeatTimes, ' '.join(additionalInfo)))
 
