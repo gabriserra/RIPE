@@ -4,7 +4,7 @@
  * Released under the MIT license (see file named LICENSE)
  *
  * This program is part the paper titled
- * RIPE: Runtime Intrusion Prevention Evaluator 
+ * RIPE: Runtime Intrusion Prevention Evaluator
  * Authored by: John Wilander, Nick Nikiforakis, Yves Younan,
  *              Mariam Kamkar and Wouter Joosen
  * Published in the proceedings of ACSAC 2011, Orlando, Florida
@@ -20,29 +20,28 @@
 #ifndef RIPE_ATTACK_PARAMETERS_H
 #define RIPE_ATTACK_PARAMETERS_H
 
-#define ATTACK_IMPOSSIBLE -900
-#define ATTACK_NOT_IMPLEMENTED -909
+#define ATTACK_IMPOSSIBLE -1
+#define ATTACK_NOT_IMPLEMENTED -1
 
 /* Enumerations for typing of attack form parameters                        */
-/* Each enumeration has its own integer space to provide better type safety */
 enum techniques
 {
-	DIRECT = 100,
+	DIRECT,
 	INDIRECT
 };
 enum inject_params
 {
-	INJECTED_CODE_NO_NOP = 200,
+	INJECTED_CODE_NO_NOP,
 	INJECTED_CODE_SIMPLE_NOP,
-	INJECTED_CODE_POLY_NOP,
+	INJECTED_CODE_SIMPLE_NOP_EQUIVALENT,
 	RETURN_INTO_LIBC,
-	CREATE_FILE,
-	RETURN_ORIENTED_PROGRAMMING
+	RETURN_ORIENTED_PROGRAMMING,
+	CREATE_FILE
 };
 
 enum code_ptrs
 {
-	RET_ADDR = 300,
+	RET_ADDR,
 	OLD_BASE_PTR,
 	FUNC_PTR_STACK_VAR,
 	FUNC_PTR_STACK_PARAM,
@@ -62,14 +61,14 @@ enum code_ptrs
 };
 enum locations
 {
-	STACK = 400,
+	STACK,
 	HEAP,
 	BSS,
 	DATA
 };
 enum functions
 {
-	MEMCPY = 500,
+	MEMCPY,
 	STRCPY,
 	STRNCPY,
 	SPRINTF,
@@ -83,30 +82,60 @@ enum functions
 
 /* 2 overflow techniques */
 size_t nr_of_techniques = 2;
-char *opt_techniques[] = {"direct", "indirect"};
+char *opt_techniques[] =
+	{"direct",
+	 "indirect"};
 
 /* 4 types of injection parameters */
 size_t nr_of_inject_params = 6;
-char *opt_inject_params[] = {"nonop", "simplenop", "polynop",
-							 "returnintolibc", "createfile", "rop"};
+char *opt_inject_params[] =
+	{"nonop",
+	 "simplenop",
+	 "simplenopequival",
+	 "r2libc",
+	 "rop",
+	 "createfile"};
 
 /* 12 code pointers to overwrite */
 size_t nr_of_code_ptrs = 16;
-char *opt_code_ptrs[] = {"ret", "baseptr",
-						 "funcptrstackvar", "funcptrstackparam",
-						 "funcptrheap", "funcptrbss", "funcptrdata",
-						 "longjmpstackvar", "longjmpstackparam",
-						 "longjmpheap", "longjmpbss", "longjmpdata",
-						 "structfuncptrstack", "structfuncptrheap",
-						 "structfuncptrdata", "structfuncptrbss"};
+char *opt_code_ptrs[] =
+	{"ret",
+	 "baseptr",
+	 "funcptrstackvar",
+	 "funcptrstackparam",
+	 "funcptrheap",
+	 "funcptrbss",
+	 "funcptrdata",
+	 "longjmpstackvar",
+	 "longjmpstackparam",
+	 "longjmpheap",
+	 "longjmpbss",
+	 "longjmpdata",
+	 "structfuncptrstack",
+	 "structfuncptrheap",
+	 "structfuncptrdata",
+	 "structfuncptrbss"};
 
 /* 4 memory locations */
 size_t nr_of_locations = 4;
-char *opt_locations[] = {"stack", "heap", "bss", "data"};
+char *opt_locations[] =
+	{"stack",
+	 "heap",
+	 "bss",
+	 "data"};
 
 /* 10 vulnerable functions */
 size_t nr_of_funcs = 10;
-char *opt_funcs[] = {"memcpy", "strcpy", "strncpy", "sprintf", "snprintf",
-					 "strcat", "strncat", "sscanf", "fscanf", "homebrew"};
+char *opt_funcs[] =
+	{"memcpy",
+	 "strcpy",
+	 "strncpy",
+	 "sprintf",
+	 "snprintf",
+	 "strcat",
+	 "strncat",
+	 "sscanf",
+	 "fscanf",
+	 "homebrew"};
 
 #endif /* !RIPE_ATTACK_PARAMETERS_H */
