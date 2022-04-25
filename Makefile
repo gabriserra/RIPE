@@ -1,18 +1,23 @@
 # Makefile for RIPE
-# @author John Wilander & Nick Nikiforakis
+GCC=gcc
+CLG=clang
 
-#Depending on how you test your system you may want to comment, or uncomment
-#the following
-CFLAGS=-fno-stack-protector
-CC=gcc
-all: ripe_attack_generator
+# Depending on how you test your system you may want to comment, or uncomment the following
+# Disable stack protection, make the stack executable and add debug info
+CFLAGS=-fno-stack-protector -z execstack -g
+
+all: dir gcc_attack_gen clang_attack_gen
+
+dir:
+	if [ ! -d "build" ]; then mkdir build; fi
+
+gcc_attack_gen: ./source/ripe_attack_generator.c
+	${GCC} ${CFLAGS} ./source/ripe_attack_generator.c -o ./build/gcc_attack_gen
+
+clang_attack_gen: ./source/ripe_attack_generator.c
+	${GCC} ${CFLAGS} ./source/ripe_attack_generator.c -o ./build/clang_attack_gen
 
 clean:
-	rm ./build/*
-
-
-# ATTACK GENERATOR COMPILE
-ripe_attack_generator: ./source/ripe_attack_generator.c
-	${CC} ${CFLAGS} ./source/ripe_attack_generator.c -m32 -o ./build/ripe_attack_generator 
+	rm -rf build
 	
 
