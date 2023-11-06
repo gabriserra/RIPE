@@ -11,11 +11,11 @@ all: dir gcc_attack_gen clang_attack_gen
 dir:
 	if [ ! -d "build" ]; then mkdir build; fi
 
-gcc_attack_gen: ./source/ripe_attack_generator.c
-	${GCC} ${CFLAGS} ./source/ripe_attack_generator.c -o ./build/gcc_attack_gen
+gcc_attack_gen: ./source/attack_gen.c
+	${GCC} ${CFLAGS} -Isource/arch ./source/attack_gen.c -o ./build/gcc_attack_gen
 
-clang_attack_gen: ./source/ripe_attack_generator.c
-	${GCC} ${CFLAGS} ./source/ripe_attack_generator.c -o ./build/clang_attack_gen
+clang_attack_gen: ./source/attack_gen.c
+	${GCC} ${CFLAGS} -Isource/arch ./source/attack_gen.c -o ./build/clang_attack_gen
 
 clean:
 	rm -rf build
